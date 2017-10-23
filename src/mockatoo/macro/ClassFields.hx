@@ -14,14 +14,14 @@ import haxe.ds.StringMap;
 using haxe.macro.Tools;
 using mockatoo.macro.Tools;
 
-typedef TypeDeclaration = 
+typedef TypeDeclaration =
 {
 	name:String,
 	type:Type
 }
 
 #if (haxe_ver < 3.1)
-typedef TypeParameter = 
+typedef TypeParameter =
 {
 	name : String,
 	t : Type
@@ -46,7 +46,7 @@ class ClassFields
 		Console.log(c.name + ":" + paramTypes);
 
 		var paramMap = getClassTypeDeclarationMap(c, paramTypes);
-		
+
 		// recurse through super classes (or interfaces if an interface)
 		var superTypes:Array<{ t : Ref<ClassType>, params : Array<Type> }> = [];
 
@@ -67,7 +67,7 @@ class ClassFields
 				fieldMap.set(field.name, field);
 			}
 		}
-		
+
 		for (classField in c.fields.get())
 		{
 			try
@@ -79,7 +79,7 @@ class ClassFields
 			{
 				//probaby a macro function
 			}
-			
+
 		}
 
 		if (includeStatics)
@@ -172,7 +172,7 @@ class ClassFields
 			case TType(t, params):
 				return TType(t, mapTypes(params,map));
 			default:
-				return type;	
+				return type;
 		}
 	}
 
@@ -240,7 +240,7 @@ class ClassFields
 					return TPath({pack:[], name:"StdTypes", sub:"Dynamic", params:[]});
 
 				var param = TPType(t.toComplexType());
-				
+
 				return TPath({pack:[], name:"StdTypes", sub:"Dynamic", params:[param]});
 			default:
 				return haxe.macro.TypeTools.toComplexType(type);
@@ -321,7 +321,7 @@ class ClassFields
 				arg.opt = verifyOptionalArgIsActuallyNullable(arg);
 			}
 
-			var value = 
+			var value =
 			{
 				value : value, //Null<Expr>
 				type : argType, //<ComplexType>
@@ -355,10 +355,11 @@ class ClassFields
 			case AccNormal, AccInline: "default";
 			case AccNo: "null";
 			case AccNever: "never";
+			case AccCtor: "never";
 			case AccResolve: throw "not implemented for VarAccess [" + access + "]";
 			case AccCall: "property";
 			case AccRequire(_,_): throw "not implemented VarAccess [" + access + "]";
-		}		
+		}
 	}
 
 	/**

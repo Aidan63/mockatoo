@@ -15,7 +15,7 @@ using StringTools;
 using haxe.macro.Tools;
 using mockatoo.macro.Tools;
 
-typedef PropertyMeta = 
+typedef PropertyMeta =
 {
 	var get:String;
 	var set:String;
@@ -68,7 +68,7 @@ class MockMaker
 
 		try
 		{
-			type = Context.getType(id);	
+			type = Context.getType(id);
 		}
 		catch(e:Dynamic)
 		{
@@ -79,13 +79,13 @@ class MockMaker
 			}
 			else
 			{
-				throw new mockatoo.exception.MockatooException("Cannot mock unknown type [" + id + "]");	
+				throw new mockatoo.exception.MockatooException("Cannot mock unknown type [" + id + "]");
 			}
 		}
-		
+
 		Console.log(type);
 		actualType = type.follow();
-		
+
 		Console.log(type);
 		Console.log(actualType);
 
@@ -129,7 +129,7 @@ class MockMaker
 		{
 			var typeParams:Array<TypeParam> = [];
 			for (type in params)
-			{	
+			{
 				try
 				{
 					var complexType = type.toComplexType();
@@ -154,29 +154,29 @@ class MockMaker
 		}
 
 		Console.log(generatedExpr.toString());
-		return generatedExpr;	
+		return generatedExpr;
 	}
 
 	function toComplexType(type:Type):ComplexType
 	{
 		return type.toComplexType();
 	}
-	
+
 	/**
 		Generates a dynamic object matching a TypeDef structure
 	*/
 	function createMockFromStruct(fields:Array<ClassField>)
 	{
-		var args:Array<{ field : String, expr : Expr }> = [];
+		var args:Array<ObjectField> = [];
 
-		var arg:{ field : String, expr : Expr };
+		var arg:ObjectField;
 
 		for (field in fields)
 		{
 			Console.log(field.name);
 			arg = {field:field.name, expr:null};
 
-		
+
 			switch (field.type)
 			{
 				case TInst(_,_):
@@ -184,7 +184,7 @@ class MockMaker
 				case TType(_,_):
 					arg.expr = toComplexType(field.type).getDefaultValue();
 				case TEnum(_,_):
-					arg.expr = toComplexType(field.type).getDefaultValue();					
+					arg.expr = toComplexType(field.type).getDefaultValue();
 				case TFun(functionArgs, ret):
 					var e = toComplexType(field.type).getDefaultValue();
 					var fargs:Array<FunctionArg> = [];
@@ -197,7 +197,7 @@ class MockMaker
 							type: toComplexType(a.t),
 							value: null
 						};
-					
+
 						fargs.push(arg);
 					}
 
@@ -221,7 +221,7 @@ class MockMaker
 	}
 
 	/**
-		Creates a class definition for a mocked class or interface 
+		Creates a class definition for a mocked class or interface
 	*/
 	function createMockFromClass()
 	{
@@ -229,7 +229,7 @@ class MockMaker
 		Console.log("id: " + id);
 		Console.log("type: " + type);
 		Console.log("actual: " + actualType);
-		
+
 		switch (actualType)
 		{
 			case TInst(t, typeParams):
@@ -251,7 +251,7 @@ class MockMaker
 		isInterface = classType.isInterface;
 
 		if (isInterface) isSpy = false;
-		
+
 		Console.log("params: " + params);
 		Console.log("isSpy " +  isSpy);
 		Console.log("class " +  classType.name);
@@ -296,7 +296,7 @@ class MockMaker
 		var paramTypes:Array<TypeParamDecl> = [];
 
 		Console.log("classType.params:" + classType.params);
-		
+
 		for (i in 0...classType.params.length)
 		{
 			var param = classType.params[i];
@@ -435,7 +435,7 @@ class MockMaker
 		}
 		return temp;
 	}
-	
+
 	function debugPrintClass()
 	{
 		var printer = new haxe.macro.Printer();
@@ -461,7 +461,7 @@ class MockMaker
 					metadata.push(meta);
 			}
 		}
-		
+
 		return metadata;
 	}
 
@@ -546,7 +546,7 @@ class MockMaker
 					#end
 
 					return;
-					
+
 				}
 
 				if (Context.defined("flash"))
@@ -570,7 +570,7 @@ class MockMaker
 				{
 					fields.push(field);
 				}
-					
+
 			case FVar(_,_):
 				if (isInterface) fields.push(field);
 			case FProp(get, set, t,_):
@@ -583,13 +583,13 @@ class MockMaker
 				if (getMethod != "" || setMethod != "")
 					propertyMetas.push({name:field.name, set:setMethod, get:getMethod});
 
-				if (isInterface) 
+				if (isInterface)
 				{
 					//force concrete property for getter setter
 					addConcretePropertyMetadata(field);
 
 					fields.push(field);
-			 
+
 					if (getMethod != "")
 					{
 						var getter = createGetterFunction(getMethod, t, field.pos);
@@ -724,7 +724,7 @@ class MockMaker
 		{
 			e = e.call();
 		}
-		else 
+		else
 		{
 			var args:Array<Expr> = [];
 
@@ -775,7 +775,7 @@ class MockMaker
 			arg.type = normaliseComplexType(arg.type);
 			args.push(macro cast $i{arg.name});
 		}
-		
+
 		var eMockOutcome = createMockFieldExprs(field, args);
 		var eCaseReturns = macro mockatoo.internal.MockOutcome.returns(v);
 		var eCaseThrows = macro mockatoo.internal.MockOutcome.throws(v);
@@ -796,7 +796,7 @@ class MockMaker
 				f.ret = normaliseComplexType(f.ret);
 
 			Console.log(field.name + ":" + Std.string(f.ret));
-		
+
 			var eDefaultReturnValue = f.ret.getDefaultValue(); //default return type (usually 'null')
 
 			var eSuper =  ("super." + field.name).toFieldExpr().call(args);
@@ -810,7 +810,7 @@ class MockMaker
 			{
 				case $eCaseReturns: return v;
 				case $eCaseThrows: throw v;
-				case $eCaseCalls: 
+				case $eCaseCalls:
 					var args:Array<Dynamic> = $eArgs;
 					return v(args);
 				case $eCaseStubs: return $eDefaultReturnValue;
@@ -819,7 +819,7 @@ class MockMaker
 			}
 		}
 		else if (isVoidVoid(f.ret))
-		{	
+		{
 			var eReturn = macro function(){};
 
 			var eSuper =  ("super." + field.name).toFieldExpr().call(args);
@@ -833,7 +833,7 @@ class MockMaker
 			{
 				case $eCaseReturns: return v;
 				case $eCaseThrows: throw v;
-				case $eCaseCalls: 
+				case $eCaseCalls:
 					var args:Array<Dynamic> = $eArgs;
 					return v(args);
 				case $eCaseStubs: return $eReturn;
@@ -853,7 +853,7 @@ class MockMaker
 			eSwitch= macro switch ($eMockOutcome)
 			{
 				case $eCaseThrows: throw v;
-				case $eCaseCalls: 
+				case $eCaseCalls:
 					var args:Array<Dynamic> = $eArgs;
 					v(args);
 				case $eCaseStubs: $eNull;
@@ -868,7 +868,7 @@ class MockMaker
 
 		var meta = createMockFieldMeta(field, f);
 		field.meta.push(meta);
-		
+
 		//validate optional args
 		for (arg in f.args)
 		{
@@ -887,7 +887,7 @@ class MockMaker
 		{
 			switch (type)
 			{
-				case TFunction(args,ret): 
+				case TFunction(args,ret):
 					if (args.length == 0 && !isNotVoid(ret))
 					{
 						return true;
@@ -898,7 +898,7 @@ class MockMaker
 		}
 		return false;
 	}
- 
+
 	function updateVoidVoid(type:ComplexType):ComplexType
 	{
 		if (!isVoidVoid(type)) return type;
@@ -928,7 +928,7 @@ class MockMaker
 
 		return macro mockProxy.getOutcomeFor(${eName}, ${eArgs});
 	}
-		
+
 	function normaliseComplexType(complexType:ComplexType):ComplexType
 	{
 		if(complexType == null) return null;
@@ -952,7 +952,7 @@ class MockMaker
 				var param = typePath.params[i];
 				typePath.params[i] = switch(param)
 				{
-					case TPType(t): 
+					case TPType(t):
 						switch(t)
 						{
 							case TAnonymous(fields): param;
@@ -981,7 +981,7 @@ class MockMaker
 	function toPrivateComplexType(typePath:TypePath):ComplexType
 	{
 		var module = typePath.pack.concat([typePath.name]).join(".");
-		
+
 		for (type in Context.getModule(module))
 		{
 			var baseType:BaseType = switch (type)
@@ -989,10 +989,10 @@ class MockMaker
 				case TInst(t,p): t.get();
 				case TEnum(t,p): t.get();
 				case TType(t,p): t.get();
-				case TAbstract(t,p): 
+				case TAbstract(t,p):
 					var id = t.get().type.getId().toComplex();
 
-					
+
 						null;
 				case _: null;
 			}
@@ -1003,7 +1003,7 @@ class MockMaker
 				return type.toLazyComplexType();
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -1016,8 +1016,8 @@ class MockMaker
 			- default argument values (usually null, may differ on static targets)'
 			- return type (if applicable)
 
-		For example: 
-		
+		For example:
+
 			@mock(["String", "?foo.Bar"], [null,null], returns.Something)
 	*/
 	function createMockFieldMeta(field:Field, f:Function)
@@ -1032,7 +1032,7 @@ class MockMaker
 
 			if (functionArg.type != null)
 				value += functionArg.type.toString();
-	
+
 			args.push(macro $v{value});
 		}
 
@@ -1079,7 +1079,7 @@ class MockMaker
 		Returns an empty constructor field.
 	*/
 	function createEmptyConstructor():Field
-	{	
+	{
 		var constructorExprs = createMockConstructorExprs();
 		var exprs = EBlock([constructorExprs]).at();
 
@@ -1097,7 +1097,7 @@ class MockMaker
 			expr: exprs
 		}
 
-		return 
+		return
 		{
 			pos:Context.currentPos(),
 			name:"new",
