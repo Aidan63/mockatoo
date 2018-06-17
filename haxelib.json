@@ -1,0 +1,15 @@
+{
+	"name": "mockatoo",
+	"license": "MIT",
+	"tags": [],
+	"description": "Mockatoo is a Haxe library for mock creation, verification and stubbing.",
+	"contributors": [ "massive" ],
+	"classPath": "src",
+	"releasenote": "See https://github.com/misprintt/mockatoo/blob/master/CHANGES.md",
+	"version": "3.2.1",
+	"url": "http://github.com/misprintt/mockatoo",
+	"dependencies": 
+	{
+		"mconsole": ""
+	}
+}
