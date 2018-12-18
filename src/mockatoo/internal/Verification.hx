@@ -10,6 +10,6 @@ abstract Verification(VerificationMode) from Dynamic to Dynamic
 {
 	public function new(mode:VerificationMode)
 	{
-		this.mode = mode;	
+		this = mode;	
 	}
 }
